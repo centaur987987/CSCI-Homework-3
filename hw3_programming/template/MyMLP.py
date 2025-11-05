@@ -166,8 +166,8 @@ class MLP:
     #        r, gt one-hot labels (n, 10)
     # Output: gra_v, (num_hid, 10)
     def dEdv(self, z, y, r):
-        # placeholder
-        out = np.zeros_like(self.v)
+        # Using equation 11.28 from textbook
+        out = z.T @ (y - r)
 
         return out
 
@@ -180,8 +180,12 @@ class MLP:
     # c = np.ones(n,1)
     # gra_v0 = c.T@(y-r) or (y-r).sum(axis=0)
     def dEdv0(self, y, r):
-        # placeholder
-        out = np.zeros_like(self.v0)
+        
+        n = y.shape[0]  # Find the 'n' number of entries needed for the v0 vector
+        v0_vector = np.ones(n) # build a vector of 1's, n long
+        
+        # Based on equation 11.28 from text
+        out = v0_vector.T @ (y - r)
 
         return out
 
