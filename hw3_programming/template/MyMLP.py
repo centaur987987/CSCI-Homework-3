@@ -199,9 +199,8 @@ class MLP:
     #        r, gt one-hot labels (n, 10)
     # Output: out, gra_w, (64, num_hid)
     def dEdw(self, z, y, x, r):
-        # placeholder
+        
         out = np.zeros_like(self.w)
-
         return out
 
     # Input: z, output of the intermediate layer (n, num_hid) 
@@ -221,6 +220,10 @@ class MLP:
     # Output: no return, direcly update the class parameters self.w, self.w0, .....
     # e.g self.w = self.w - self.lr*gra_w
     def update(self, gra_w, gra_w0, gra_v, gra_v0):
+        self.w = self.w - self.lr * gra_w
+        self.w0 = self.w0 - self.lr * gra_w0
+        self.v = self.v - self.lr  *gra_v
+        self.v0 = self.v0 - self.lr * gra_v0
         return 
 
 
