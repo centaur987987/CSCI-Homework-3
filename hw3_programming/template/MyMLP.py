@@ -199,8 +199,15 @@ class MLP:
     #        r, gt one-hot labels (n, 10)
     # Output: out, gra_w, (64, num_hid)
     def dEdw(self, z, y, x, r):
+        # see written submission for equation derivation
+        # UFind partial derivatives to solve for DEdw
+        dEdz = (y - r) @ self.v.T # 
+        dzdx = 1 - np.square(z)
+        dxdw = x.T  
         
-        out = np.zeros_like(self.w)
+        # multiply partial derivatives together in the order derived on the written.
+        dEdx = dEdz * dzdx
+        out = dxdw @ dEdx # multiply x at the beginning to get the sizing correct
         return out
 
     # Input: z, output of the intermediate layer (n, num_hid) 
@@ -208,9 +215,21 @@ class MLP:
     #        r, gt one-hot labels (n, 10)
     # Output: out, gra_w, (1, num_hid)
     def dEdw0(self, z, y, r):
-        # placeholder
-        out = np.zeros_like(self.w0)
+        # see written submission for equation derivation
+        # almost the same except dxdw is different
 
+        # Use the same partial derivatives for dEdw, except for dxdw
+        dEdz = (y - r) @ self.v.T # 
+        dzdx = 1 - np.square(z) 
+        dEdx = dEdz * dzdx
+        
+        # find w0 specific dxdw
+        n = y.shape[0]  # Find the 'n' number of entries needed for the v0 vector
+        dxdw = np.ones(n) # build a vector of 1's, n long
+     
+        # final multiplication
+        out = dxdw.T @ dEdx 
+        
         return out
 
     # Input: gra_w,  
@@ -220,19 +239,21 @@ class MLP:
     # Output: no return, direcly update the class parameters self.w, self.w0, .....
     # e.g self.w = self.w - self.lr*gra_w
     def update(self, gra_w, gra_w0, gra_v, gra_v0):
+        #update all the self. variables based on the equation "self.w = self.w - self.lr*gra_w"
         self.w = self.w - self.lr * gra_w
         self.w0 = self.w0 - self.lr * gra_w0
         self.v = self.v - self.lr  *gra_v
         self.v0 = self.v0 - self.lr * gra_v0
         return 
 
-
     # ----------------------- Implement this function --------------------------
     # you may reuse self.forward, but take care of the return values
     # the returned labels should be class index, rather than probability
     def predict(self,x):
-        # place holders
-        y = np.zeros([x.shape[0]])
+        # use self.forward to obtain y
+        z, y = self.forward(x)
+        # find the maximum value from each row and print the index
+        y =  np.argmax(y, axis=1)
         return y
 
     def get_hidden(self,x):
